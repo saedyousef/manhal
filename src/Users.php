@@ -26,11 +26,16 @@ class Users {
 	*/
 	public function signup($username, $email, $password, $passwordConfirmation, $dateOfBirth)
 	{
-		if (isset($_SESSION['user_id'])) {
-    		// redirect somewhere	
-		}
+		
 
 		$validationsErrors = '';
+
+		if(!$this->checkEmail($email))
+			$validationsErrors .= 'Email already exists <br>';
+
+		if(!$this->checkUsername($username))
+			$validationsErrors .= 'Username already exists <br>';
+
 		$validation = new Validations();
 		if(!$validation->email($email))
 			$validationsErrors = 'Wrong email format <br>';
@@ -56,15 +61,90 @@ class Users {
 			$_SESSION['user_id']  = $this->conn->lastInsertId();
 			$_SESSION['username'] = $username;
 			$_SESSION['email'] 	  = $email;
+
+			header('Location:index.php');
 		}
 		catch(PDOException $e){
 			return ['success' => false, 'errors' => $e->getmessage()];
 		}
 	}
 
-
+	/**
+	* This action will log the user in and starts a session for him
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $username
+	* @param $password
+	* @return redirect|mixed
+	*/
 	public function login($username, $password)
 	{
+		try {
+			$statement = $this->conn->prepare("select * from users where username = :username limit 1");
+			$statement->execute(array(':username' => strtolower($username)));
+			$userObject = $statement->fetch();
 
+			if(empty($userObject))
+				return ['success' => false, 'errors' => 'Incorrect username'];
+
+			if(!password_verify($password, $userObject['password']))
+				return ['success' => false, 'errors' => 'Inccorect password'];
+
+			$_SESSION['user_id']  = $userObject['id'];
+			$_SESSION['username'] = $userObject['username'];
+			$_SESSION['email'] 	  = $userObject['email'];
+
+			header('Location:index.php');
+		} catch (PDOException $e) {
+			return ['success' => false, 'errors' => $e->getmessage()];
+		}
+	}
+
+	/**
+	* This action will check if the email already exists or not
+	* 
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $email
+	* @return bool
+	*/
+	protected function checkEmail($email)
+	{
+		try {
+			$statement = $this->conn->prepare("select * from users where email = :email limit 1");
+			$statement->execute(array(':email' => strtolower($email)));
+			$userObject = $statement->fetch();
+
+			if(!empty($userObject))
+				return false;
+
+			return true;
+
+		} catch (PDOException $e) {
+			return ['success' => false, 'errors' => $e->getmessage()];
+		}
+	}
+
+	/**
+	* This action will check if the username already exists or not
+	* 
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $username
+	* @return bool
+	*/
+	protected function checkUsername($username)
+	{
+		try {
+			$statement = $this->conn->prepare("select * from users where username = :username limit 1");
+			$statement->execute(array(':username' => strtolower($username)));
+			$userObject = $statement->fetch();
+
+			if(!empty($userObject))
+				return false;
+
+			return true;
+
+		} catch (PDOException $e) {
+			return ['success' => false, 'errors' => $e->getmessage()];
+		}
 	}
 }

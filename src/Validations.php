@@ -62,7 +62,7 @@ class Validations {
 
 		if(strlen($username) < 6)
 			return 'Username length must be at least 6 characters <br>';
-
+		
 		return $errors;
 	}
 }
