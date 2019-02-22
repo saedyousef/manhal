@@ -4,8 +4,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include dirname(__FILE__) . '/Database/Migration.php';
+include dirname(__FILE__) . '/src/Users.php';
 
-$migration = new Migration();
-echo'<pre>';print_r ($migration->initialize());
+$users = new Users();
+$signup = $users->signup('saedyouseff', 'saedf.alzaben@gmail.com', 'Saed1234', 'Saed1234', '1993-12-12');
+echo "<pre>";print_r($signup);
 
+
+
+/*echo "<pre>";print_r($_SESSION['user_id']);*/

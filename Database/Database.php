@@ -26,10 +26,14 @@ class Database {
 		{
 			$host = Credentials::HOSTNAME;
 			$db = Credentials::DATABASE;
-			$conn = new PDO("mysql:host=$host;dbname=$db", Credentials::USERNAME, Credentials::PASSWORD);
-	    	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	    	self::$link = $conn;
+			try{
+				$conn = new PDO("mysql:host=$host;dbname=$db", Credentials::USERNAME, Credentials::PASSWORD);
+		    	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	    		self::$link = $conn;
+			 }catch(PDOException $e){
+			    echo $e->getmessage();exit();
+			 }
 		}
 
 		return self::$link;
