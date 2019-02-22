@@ -53,13 +53,9 @@ class Users {
 			    'created' 		=> date('Y-m-d H:i:s'),
 			]);
 
-			if($statmentExce)
-			{
-				$_SESSION['user_id']  = $this->conn->lastInsertId();
-				$_SESSION['username'] = $username;
-				$_SESSION['email'] 	  = $email;
-				return true;
-			}
+			$_SESSION['user_id']  = $this->conn->lastInsertId();
+			$_SESSION['username'] = $username;
+			$_SESSION['email'] 	  = $email;
 		}
 		catch(PDOException $e){
 			return ['success' => false, 'errors' => $e->getmessage()];
