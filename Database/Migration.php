@@ -24,21 +24,25 @@ class Migration {
 	protected function createUsersTable()
 	{
 
-		$sql = "CREATE TABLE IF NOT EXISTS users(
-			id int(11) primary key auto_increment,
-			email varchar(255),
-			username varchar(255),
-			password varchar(255),
-			date_of_birth date,
-			created datetime,
-			UNIQUE (email),
-			UNIQUE (username)
-		)ENGINE=InnoDB CHARACTER SET=utf8";
+		try {
+			$sql = "CREATE TABLE IF NOT EXISTS users(
+				id int(11) primary key auto_increment,
+				email varchar(255),
+				username varchar(255),
+				password varchar(255),
+				date_of_birth date,
+				created datetime,
+				UNIQUE (email),
+				UNIQUE (username)
+			)ENGINE=InnoDB CHARACTER SET=utf8";
 
-		if($this->conn->exec($sql))
-			return 'users table created successfully';
-		else
-			return 'users table does not created or already exists!';
+			if($this->conn->exec($sql))
+				return 'users table created successfully';
+			else
+				return 'users table does not created or already exists!';
+		} catch (PDOException $e) {
+			return $e->getmessage();
+		}
 	}
 
 	/**
@@ -49,19 +53,23 @@ class Migration {
 	*/
 	protected function createAlbumsTable()
 	{
-		$sql = "CREATE TABLE IF NOT EXISTS albums(
-			id int(11) primary key auto_increment,
-			user_id int(11),
-			title varchar(255),
-			descreption text,
-			thumbnail varchar(500),
-			created datetime
-		)ENGINE=InnoDB CHARACTER SET=utf8";
+		try {
+			$sql = "CREATE TABLE IF NOT EXISTS albums(
+				id int(11) primary key auto_increment,
+				user_id int(11),
+				title varchar(255),
+				descreption text,
+				thumbnail varchar(500),
+				created datetime
+			)ENGINE=InnoDB CHARACTER SET=utf8";
 
-		if($this->conn->exec($sql))
-			return 'albums table created successfully';
-		else
-			return 'albums table does not created or already exists!';
+			if($this->conn->exec($sql))
+				return 'albums table created successfully';
+			else
+				return 'albums table does not created or already exists!';
+		} catch (PDOException $e) {
+			return $e->getmessage();
+		}
 	}
 
 	/**
@@ -72,17 +80,22 @@ class Migration {
 	*/
 	protected function createImagesTable()
 	{
-		$sql = "CREATE TABLE IF NOT EXISTS albums_images(
-			id int(11) primary key auto_increment,
-			album_id int(11),
-			image_url varchar(500),
-			created datetime
-		)ENGINE=InnoDB CHARACTER SET=utf8";
+		try {
+			$sql = "CREATE TABLE IF NOT EXISTS albums_images(
+				id int(11) primary key auto_increment,
+				album_id int(11),
+				image_url varchar(500),
+				created datetime
+			)ENGINE=InnoDB CHARACTER SET=utf8";
 
-		if($this->conn->exec($sql))
-			return 'albums_images table created successfully';
-		else
-			return 'albums_images table does not created or already exists!';
+			if($this->conn->exec($sql))
+				return 'albums_images table created successfully';
+			else
+				return 'albums_images table does not created or already exists!';
+			
+		} catch (PDOException $e) {
+			return $e->getmessage();
+		}
 	}
 
 	/**
