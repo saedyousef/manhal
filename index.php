@@ -49,6 +49,7 @@ include dirname(__FILE__) . '/src/Albums.php';
     <a class="navbar-brand " href="index.php">Albums</a>
      <?php if(!$loggedIn){?>
     <div class="pull-right">
+	    <a href="gauth.php" class="btn btn-danger pull-right">Google Login</a>
 	    <a href="login.php" class="btn btn-success pull-right">Login</a>
 	    <a href="signup.php" class="btn btn-primary pull-right">Sign Up</a>
     	
