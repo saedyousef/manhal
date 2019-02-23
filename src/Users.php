@@ -59,8 +59,6 @@ class Users {
 			]);
 
 			$_SESSION['user_id']  = $this->conn->lastInsertId();
-			$_SESSION['username'] = $username;
-			$_SESSION['email'] 	  = $email;
 
 			header('Location:index.php');
 		}
@@ -91,8 +89,6 @@ class Users {
 				return ['success' => false, 'errors' => 'Inccorect password'];
 
 			$_SESSION['user_id']  = $userObject['id'];
-			$_SESSION['username'] = $userObject['username'];
-			$_SESSION['email'] 	  = $userObject['email'];
 
 			header('Location:index.php');
 		} catch (PDOException $e) {
@@ -145,6 +141,57 @@ class Users {
 
 		} catch (PDOException $e) {
 			return ['success' => false, 'errors' => $e->getmessage()];
+		}
+	}
+
+	/**
+	* This action will log user in with google account
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $email
+	* @return redirect
+	*/
+	public function googleLogin($email)
+	{
+		$statement = $this->conn->prepare("select * from users where email = :email limit 1");
+		$statement->execute(array(':email' => strtolower($email)));
+		$userObject = $statement->fetch();
+		if(empty($userObject))
+		{
+			$registerUser = $this->googleRegister($email);
+			if(!$registerUser)
+				header("Location:index.php?glfailed");
+
+			$_SESSION['user_id']  = $registerUser;
+
+			header("Location:index.php");
+		}
+		$_SESSION['user_id']  = $userObject['id'];
+		header("Location:index.php");
+	}
+
+	/**
+	* This action will create new record in users table
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $email
+	* @return userId
+	*/
+	private function googleRegister($email)
+	{
+		try {
+			$statement = $this->conn->prepare('INSERT INTO users (username, email, created)
+		    VALUES (:username, :email, :created)');
+
+			$statmentExce = $statement->execute([
+			    'username' 		=> $email,
+			    'email'    		=> $email,
+			    'created' 		=> date('Y-m-d H:i:s'),
+			]);
+
+			return $this->conn->lastInsertId();
+		} catch (Exception $e) {
+			return false;
 		}
 	}
 }
