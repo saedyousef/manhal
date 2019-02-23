@@ -65,4 +65,28 @@ class Validations {
 		
 		return $errors;
 	}
+
+
+	/**
+	* This action to validate title & description before save it to database
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $title
+	* @param $desc
+	* @return bool|mixed
+	*/
+	public function album($title, $desc)
+	{
+		$errors = '';
+
+		if(strlen($title)  < 4)
+			$errors .= 'title length must be at least 4 characters <br>' ;
+		if(strlen($desc)  < 20)
+			$errors .= 'description length must be at least 20 characters <br>' ;
+
+		if(empty($errors))
+			return null;
+
+		return $errors;
+	}
 }

@@ -1,5 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT']. 'Database/Database.php';
+include dirname(__FILE__) . '/Validations.php';
+
 /**
 * 
 */
@@ -23,11 +25,11 @@ class Albums
 	{
 		try {
 			$statement = $this->conn->prepare("select * from albums where user_id = :user_id");
-			$statement->execute(array(':user_id' => strtolower($user_id)));
+			$statement->execute(array(':user_id' => $userId));
 			$albums = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 			if (empty($albums))
-				return false;
+				return null;
 
 			return $albums;
 			header('Location:index.php');
@@ -43,18 +45,17 @@ class Albums
 	* @param $albumId
 	* @return array|mixed
 	*/
-	public function getAlbumsImages($albumId)
+	protected function getAlbumsImages($albumId)
 	{
 		try {
 			$statement = $this->conn->prepare("select * from albums_images where album_id = :album_id");
-			$statement->execute(array(':album_id' => strtolower($album_id)));
+			$statement->execute(array(':album_id' => $albumId));
 			$images = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 			if (empty($images))
-				return false;
+				return null;
 
 			return $images;
-			header('Location:index.php');
 		} catch (PDOException $e) {
 			return ['success' => false, 'errors' => $e->getmessage()];
 		}
@@ -67,18 +68,19 @@ class Albums
 	* @param $albumId
 	* @return array|mixed
 	*/
-	public function viewAlbum($albumId)
+	public function alubmDetails($albumId)
 	{
 		try {
-			$statement = $this->conn->prepare("select * from albums_images where album_id = :album_id");
-			$statement->execute(array(':album_id' => strtolower($album_id)));
-			$images = $statement->fetch();
+			$statement = $this->conn->prepare("select * from albums where id = :album_id");
+			$statement->execute(array(':album_id' => $albumId));
+			$images = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
 			if (empty($images))
-				return false;
-
-			return $images;
-			header('Location:index.php');
+				return ['success' => false, 'errors' => 'No albums found with this id'];
+			$data = [];
+			$data['album'] = $images[0];
+			$data['images'] = $this->getAlbumsImages($albumId);
+			return $data;
 		} catch (PDOException $e) {
 			return ['success' => false, 'errors' => $e->getmessage()];
 		}
@@ -99,6 +101,14 @@ class Albums
 	public function saveAlbum($user_id, $title, $descreption, $thumbnail, $images)
 	{
 		try{
+
+			$validation = new Validations();
+
+			$errors = $validation->album($title, $descreption);
+
+			if(!empty($errors))
+				return ['success' => false, 'errors' => $errors];
+
 			$statement = $this->conn->prepare('INSERT INTO albums (user_id, title, descreption, thumbnail, created)
 		    VALUES (:user_id, :title, :descreption, :thumbnail, :created)');
 
@@ -132,6 +142,101 @@ class Albums
 		}
 		catch(PDOException $e){
 			return ['success' => false, 'errors' => $e->getmessage()];
+		}
+	}
+
+	/**
+	* This action will check ig the album exists or not
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $id
+	* @return bool
+	*/
+	private function checkAlbum($id)
+	{
+		try 
+		{
+			$statement = $this->conn->prepare("SELECT id from albums where id = :id");
+			$statement->execute(array(':id' => $id));
+			$album = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+			if(empty($album))
+				return false;
+
+			return true;
+		} catch(PDOException $e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	* This action will check if the image exists or not
+	*
+	* @author Saed Yousef <saed.alzaben@gmail.com>
+	* @param $id
+	* @return bool
+	*/
+	private function checkImage($id)
+	{
+		try 
+		{
+			$statement = $this->conn->prepare("SELECT id from albums_images where id = :id");
+			$statement->execute(array(':id' => $id));
+			$album = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+			if(empty($album))
+				return false;
+
+			return true;
+		} catch(PDOException $e)
+		{
+			return false;
+		}
+	}
+
+
+	/**
+	* This actil will delete album from database
+	*
+	* @author Saed Yousef
+	* @param $id
+	* @return bool
+	*/
+	public function deleteAlbum($id)
+	{
+		if(!$this->checkAlbum($id)){
+			return false;
+		}
+
+		try {
+			$statement = $this->conn->prepare("DELETE  from albums where id = :id");
+			$statement->execute(array(':id' => $id));
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	/**
+	* This actil will delete image from database
+	*
+	* @author Saed Yousef
+	* @param $id
+	* @return bool
+	*/
+	public function deleteImage($id)
+	{
+		if(!$this->checkImage($id)){
+			return false;
+		}
+
+		try {
+			$statement = $this->conn->prepare("DELETE  from albums_images where id = :id");
+			$statement->execute(array(':id' => $id));
+			return true;
+		} catch (PDOException $e) {
+			return false;
 		}
 	}
 }

@@ -7,10 +7,10 @@ include dirname(__FILE__) . '/src/Users.php';
 		header('Location:index.php');
 	if(isset($_POST['signup']))
 	{
-		$username = $_POST['username'];
+		$username = strip_tags($_POST['username']);
 		$password = $_POST['password'];
 		$passwordConfirmation = $_POST['password_confirmation'];
-		$email = $_POST['email'];
+		$email = strip_tags($_POST['email']);
 		$dateOfBirth = $_POST['date_of_birth'];
 		//converte date format
 		$dateOfBirth = date("Y-m-d", strtotime($dateOfBirth));
@@ -40,7 +40,7 @@ include dirname(__FILE__) . '/src/Users.php';
 </head>
 <body>
 	<nav class="navbar bg-dark navbar-dark ">
-    <a class="navbar-brand " href="index.php">Home</a>
+    <a class="navbar-brand " href="index.php">Albums</a>
     <div class="pull-right">
 	    <a href="login.php" class="btn btn-success pull-right">Login</a>
 	    <a href="signup.php" class="btn btn-primary pull-right">Sign Up</a>

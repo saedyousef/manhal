@@ -10,13 +10,15 @@ include dirname(__FILE__) . '/src/Users.php';
 	$users = new Users();
 	if(isset($_POST['submit']))
 	{
-		$username = $_POST['username'];
+		$username = strip_tags($_POST['username']);
 		$password = $_POST['password'];
 
 		$login = $users->login($username, $password);
 
 		if(isset($login['success']) && !$login['success'])
 			$errors = $login['errors'];
+		else
+			header("Location:index.php");
 	}
 ?>
 
@@ -34,7 +36,7 @@ include dirname(__FILE__) . '/src/Users.php';
 </head>
 <body>
 	<nav class="navbar bg-dark navbar-dark ">
-    <a class="navbar-brand " href="index.php">Home</a>
+    <a class="navbar-brand " href="index.php">Albums</a>
     <div class="pull-right">
 	    <a href="login.php" class="btn btn-success pull-right">Login</a>
 	    <a href="signup.php" class="btn btn-primary pull-right">Sign Up</a>
