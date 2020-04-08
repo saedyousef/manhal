@@ -1,6 +1,6 @@
 # After cloning this project make the following:
 
-## Install the googleapi sdk in your project
+## Install the googleapi sdk into your project
 ``composer install``
 
 #### You may need to configure the database credientials at
